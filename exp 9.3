@@ -1,0 +1,143 @@
+// Simple Express API - backend/server.js
+
+
+2	+
+const express = require('express');
+3	+
+const cors = require('cors');
+4	+
+5	+
+const app = express();
+6	+
+app.use(cors());
+7	+
+app.use(express.json());
+8	+
+9	+
+// Example protected route placeholder (token auth can be added)
+10	+
+app.get('/api/message', (req, res) => {
+11	+
+  res.json({ message: 'Hello from Backend instance ' + (process.env.INSTANCE_ID || '') });
+12	+
+});
+13	+
+14	+
+app.get('/api/time', (req, res) => {
+15	+
+  res.json({ serverTime: new Date().toISOString() });
+16	+
+});
+17	+
+18	+
+const PORT = process.env.PORT || 5000;
+19	+
+app.listen(PORT, () => console.log(`Backend listening on ${PORT}`));
+20	+
+module.exports = {
+21	+
+  apps: [
+22	+
+    {
+23	+
+      name: "backend",
+24	+
+      script: "./server.js",
+25	+
+      env: {
+26	+
+        NODE_ENV: "production",
+27	+
+      },
+28	+
+    },
+29	+
+  ],
+30	+
+};
+31	+
+{
+32	+
+  "name": "frontend",
+33	+
+  "version": "1.0.0",
+34	+
+  "private": true,
+35	+
+  "scripts": {
+36	+
+    "start": "react-scripts start",
+37	+
+    "build": "react-scripts build"
+38	+
+  },
+39	+
+  "dependencies": {
+40	+
+    "react": "^18.2.0",
+41	+
+    "react-dom": "^18.2.0",
+42	+
+    "react-scripts": "5.0.1"
+43	+
+  }
+44	+
+}
+45	+
+import React, { useEffect, useState } from "react";
+46	+
+47	+
+export default function App() {
+48	+
+  const [msg, setMsg] = useState("Loading...");
+49	+
+50	+
+  useEffect(() => {
+51	+
+    fetch("/api/message")
+52	+
+      .then((r) => r.json())
+53	+
+      .then((d) => setMsg(d.message))
+54	+
+      .catch((e) => setMsg("Could not reach backend: " + e));
+55	+
+  }, []);
+56	+
+57	+
+  return (
+58	+
+    <div style={{ textAlign: "center", marginTop: 120, fontFamily: "sans-serif" }}>
+59	+
+      <h1>Fullstack EC2 + ALB Demo</h1>
+60	+
+      <p>{msg}</p>
+61	+
+      <p>Time from server: <em><ServerTime /></em></p>
+62	+
+    </div>
+63	+
+  );
+64	+
+}
+65	+
+66	+
+function ServerTime() {
+67	+
+  const [t, setT] = useState("-");
+68	+
+  useEffect(() => {
+69	+
+    fetch("/api/time")
+70	+
+      .then(r => r.json())
+71	+
+      .then(d => setT(d.serverTime))
+72	+
+      .catch(() => setT("unavailable"));
+73	+
+  }, []);
+74	+
+  return t;
+75	+
+}
